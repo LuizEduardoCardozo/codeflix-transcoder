@@ -2,7 +2,6 @@ package database
 
 import (
 	"encoder/domain"
-	"fmt"
 	"log"
 
 	"gorm.io/driver/sqlite"
@@ -27,12 +26,12 @@ func (db *Database) Connect() (*gorm.DB, error) {
 	switch db.Env {
 	case "test":
 		{
-			ConnectDsn = sqlite.Open(fmt.Sprintln(db.DBDSNTest))
+			ConnectDsn = sqlite.Open(db.DBDSNTest)
 			ConnectOptions = db.DBOptionsTest
 		}
 	default:
 		{
-			ConnectDsn = sqlite.Open(fmt.Sprintln(nil))
+			ConnectDsn = sqlite.Open(db.DBDSN)
 			ConnectOptions = db.DBOptions
 		}
 	}
