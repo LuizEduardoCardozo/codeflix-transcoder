@@ -61,7 +61,7 @@ func NewTestDB() *gorm.DB {
 	dbInstance := NewDB()
 
 	dbInstance.Env = "test"
-	dbInstance.DBDSNTest = "test.sqlite"
+	dbInstance.DBDSNTest = "file::memory:?cache=shared"
 	dbInstance.DBOptionsTest = &gorm.Config{}
 	dbInstance.AutoMigrationDB = true
 	dbInstance.Debug = true
