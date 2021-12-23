@@ -2,7 +2,6 @@ package domain_test
 
 import (
 	"encoder/domain"
-	"fmt"
 	"testing"
 	"time"
 
@@ -63,7 +62,7 @@ func TestIfOutputBucketPathIsNotNull(t *testing.T) {
 		t.Errorf("fail when creating the job: %s\n", err)
 	}
 
-	job.OutputBucketPath = fmt.Sprint("")
+	job.OutputBucketPath = ""
 
 	err = job.Validate()
 
@@ -84,7 +83,7 @@ func TestIfStatusIsNotNull(t *testing.T) {
 		t.Errorf("fail when creating the job: %s\n", err)
 	}
 
-	job.Status = fmt.Sprint("")
+	job.Status = ""
 
 	err = job.Validate()
 
