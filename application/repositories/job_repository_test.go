@@ -152,6 +152,34 @@ func TestIfJobRepositoryCanFindByIdAnExistentVideo(t *testing.T) {
 	require.Equal(t, job.ID, foundJob.ID)
 }
 
+func TestIfJobRepositoryCanPopulateVideoWhenFind(t *testing.T) {
+	fake := faker.New()
+
+	db := database.NewTestDB()
+	video := domain.NewVideo()
+
+	video.ID = uuid.NewV4().String()
+	video.FilePath = fake.File().FilenameWithExtension()
+	video.CreatedAt = time.Now()
+
+	job, err := domain.NewJob(fake.File().FilenameWithExtension(), "status", video)
+	if err != nil {
+		t.Errorf("error while creating the new job: %s", err.Error())
+	}
+
+	if err := db.Create(job); err.Error != nil {
+		t.Errorf("error while inserting the video, %s", err.Error)
+	}
+
+	repo := repositories.NewJobRepository(db)
+
+	foundJob, err := repo.FindById(job.ID)
+	if err != nil {
+		t.Errorf("error while searching for the video, %s", err.Error())
+	}
+
+	require.Equal(t, job.Video.ResourceID, foundJob.Video.ResourceID)
+}
 func TestUpdateShouldReturnAnErrorIfJobDoesNotExists(t *testing.T) {
 	fake := faker.New()
 

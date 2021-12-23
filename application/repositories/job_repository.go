@@ -26,7 +26,7 @@ func (repo *JobRepositoryDB) Insert(job *domain.Job) (*domain.Job, error) {
 
 func (repo *JobRepositoryDB) FindById(id string) (*domain.Job, error) {
 	var job domain.Job
-	repo.DB.First(&job, "id = ?", id)
+	repo.DB.Preload("Video").First(&job, "id = ?", id)
 
 	if job.ID == id {
 		return &job, nil
