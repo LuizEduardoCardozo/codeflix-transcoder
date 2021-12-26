@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
 
 	"cloud.google.com/go/storage"
 )
@@ -44,6 +45,27 @@ func (v *VideoService) Download(bucketName string) (string, error) {
 	defer file.Close()
 
 	return filePath, err
+}
+
+func (v *VideoService) Fragment() error {
+	localVideoPath := os.Getenv("LOCAL_STORAGE_PATH")
+	targetDirPath := fmt.Sprintf("%s/%s", localVideoPath, v.Video.ID)
+
+	err := os.Mkdir(targetDirPath, os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	sourcePath := fmt.Sprintf("%s/%s.mp4", localVideoPath, v.Video.ID)
+	targetPath := fmt.Sprintf("%s/%s.frag", targetDirPath, v.Video.ID)
+
+	cmd := exec.Command("mp4fragment", sourcePath, targetPath)
+	_, err = cmd.CombinedOutput()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func NewVideoService(video *domain.Video, videoRepository repositories.VideoRepository, storageClient *storage.Client) *VideoService {
