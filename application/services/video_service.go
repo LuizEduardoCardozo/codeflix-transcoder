@@ -17,33 +17,33 @@ type VideoService struct {
 	StorageClient   *storage.Client
 }
 
-func (v *VideoService) Download(bucketName string) error {
+func (v *VideoService) Download(bucketName string) (string, error) {
 	reader, err := v.StorageClient.Bucket(bucketName).Object(v.Video.FilePath).NewReader(context.TODO())
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer reader.Close()
 
 	fileContent, err := ioutil.ReadAll(reader)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	localVideoPath := os.Getenv("LOCAL_STORAGE_PATH")
-	fileName := fmt.Sprintf("%s/%s.mp4", localVideoPath, v.Video.ID)
+	filePath := fmt.Sprintf("%s/%s.mp4", localVideoPath, v.Video.ID)
 
-	file, err := os.Create(fileName)
+	file, err := os.Create(filePath)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	_, err = file.Write(fileContent)
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer file.Close()
 
-	return nil
+	return filePath, err
 }
 
 func NewVideoService(video *domain.Video, videoRepository repositories.VideoRepository, storageClient *storage.Client) *VideoService {

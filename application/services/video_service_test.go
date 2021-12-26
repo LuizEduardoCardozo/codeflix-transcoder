@@ -5,6 +5,7 @@ import (
 	"encoder/application/services"
 	"encoder/domain"
 	"encoder/framework/database"
+	"io/ioutil"
 	"os"
 	"testing"
 	"time"
@@ -16,6 +17,19 @@ import (
 
 func TestVideoServiceDownload(t *testing.T) {
 	os.Setenv("LOCAL_STORAGE_PATH", "/tmp")
+	os.Setenv("VIDEO_MP4_TEST_LOCATION", "../../test/assets/video.mp4")
+
+	stubVideoPath := os.Getenv("VIDEO_MP4_TEST_LOCATION")
+	stubVideo, err := os.Open(stubVideoPath)
+	if err != nil {
+		t.Errorf("error while opening stub video: %s\n", err.Error())
+		assert.Nil(t, err)
+	}
+	stubVideoContent, err := ioutil.ReadAll(stubVideo)
+	if err != nil {
+		t.Errorf("error while reading stub video bytes: %s\n", err.Error())
+		assert.Nil(t, err)
+	}
 
 	video := domain.NewVideo()
 	video.ID = uuid.NewV4().String()
@@ -29,7 +43,7 @@ func TestVideoServiceDownload(t *testing.T) {
 				BucketName: "bucket_teste",
 				Name:       video.FilePath,
 			},
-			Content: []byte("inside the file"),
+			Content: stubVideoContent,
 		},
 	})
 	defer storageServer.Stop()
@@ -39,8 +53,10 @@ func TestVideoServiceDownload(t *testing.T) {
 	videoRepository := repositories.NewVideoRepository(db)
 	videoService := services.NewVideoService(video, videoRepository, storageClient)
 
-	err := videoService.Download("bucket_teste")
+	savedVideoFilePath, err := videoService.Download("bucket_teste")
+	assert.Nil(t, err)
 
+	_, err = os.Open(savedVideoFilePath)
 	assert.Nil(t, err)
 
 }
