@@ -56,10 +56,16 @@ func TestVideoServiceDownload(t *testing.T) {
 	videoService := services.NewVideoService(video, videoRepository, storageClient)
 
 	savedVideoFilePath, err := videoService.Download("bucket_teste")
-	assert.Nil(t, err)
+	if err != nil {
+		t.Errorf("error while downloading video: %s\n", err.Error())
+		assert.Nil(t, err)
+	}
 
 	_, err = os.Open(savedVideoFilePath)
-	assert.Nil(t, err)
+	if err != nil {
+		t.Errorf("error while openning downloaded video: %s\n", err.Error())
+		assert.Nil(t, err)
+	}
 
 }
 
@@ -81,8 +87,8 @@ func TestVideoFragment(t *testing.T) {
 	cmd := exec.Command("cp", stubVideoPath, sourcePath)
 	_, err := cmd.CombinedOutput()
 	if err != nil {
+		t.Errorf("error while copying the stub video to %s: %s\n", sourcePath, err.Error())
 		assert.Nil(t, err)
-		t.Error(err)
 	}
 
 	db := database.NewTestDB()
@@ -91,8 +97,8 @@ func TestVideoFragment(t *testing.T) {
 
 	err = videoService.Fragment()
 	if err != nil {
+		t.Errorf("error while fragmenting the stub video: %s\n", err.Error())
 		assert.Nil(t, err)
-		t.Error(err.Error())
 	}
 }
 
@@ -135,18 +141,30 @@ func TestDownloadAndFragmentVideo(t *testing.T) {
 	videoService := services.NewVideoService(video, videoRepository, storageClient)
 
 	savedVideoFilePath, err := videoService.Download("bucket_teste")
-	assert.Nil(t, err)
+	if err != nil {
+		t.Errorf("error while downloading video: %s\n", err.Error())
+		assert.Nil(t, err)
+	}
 
 	_, err = os.Open(savedVideoFilePath)
-	assert.Nil(t, err)
+	if err != nil {
+		t.Errorf("error while openning downloaded video: %s\n", err.Error())
+		assert.Nil(t, err)
+	}
 
 	localVideoPath := os.Getenv("LOCAL_STORAGE_PATH")
 	sourcePath := fmt.Sprintf("%s/%s.mp4", localVideoPath, video.ID)
 
 	cmd := exec.Command("cp", stubVideoPath, sourcePath)
 	_, err = cmd.CombinedOutput()
-	assert.Nil(t, err)
+	if err != nil {
+		t.Errorf("error while copying the stub video to %s: %s\n", sourcePath, err.Error())
+		assert.Nil(t, err)
+	}
 
 	err = videoService.Fragment()
-	assert.Nil(t, err)
+	if err != nil {
+		t.Errorf("error while fragmenting the stub video: %s\n", err.Error())
+		assert.Nil(t, err)
+	}
 }
