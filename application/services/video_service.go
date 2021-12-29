@@ -68,6 +68,31 @@ func (v *VideoService) Fragment() error {
 	return nil
 }
 
+func (v *VideoService) Encode() error {
+	localVideoPath := os.Getenv("LOCAL_STORAGE_PATH")
+
+	targetDirPath := fmt.Sprintf("%s/%s", localVideoPath, v.Video.ID)
+	fragmentedVideoPath := fmt.Sprintf("%s/%s.frag", targetDirPath, v.Video.ID)
+
+	cmdArgs := []string{}
+	cmdArgs = append(cmdArgs, fragmentedVideoPath)
+	cmdArgs = append(cmdArgs, "-f")
+	cmdArgs = append(cmdArgs, "--use-segment-timeline")
+	cmdArgs = append(cmdArgs, "-o")
+	cmdArgs = append(cmdArgs, targetDirPath)
+
+	fmt.Println("mp4dash", cmdArgs)
+
+	cmd := exec.CommandContext(context.TODO(), "mp4dash", cmdArgs...)
+	out, err := cmd.Output()
+	if err != nil {
+		fmt.Println("output:", string(out))
+		return err
+	}
+
+	return nil
+}
+
 func NewVideoService(video *domain.Video, videoRepository repositories.VideoRepository, storageClient *storage.Client) *VideoService {
 	return &VideoService{
 		Video:           video,
