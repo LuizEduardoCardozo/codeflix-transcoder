@@ -81,8 +81,6 @@ func (v *VideoService) Encode() error {
 	cmdArgs = append(cmdArgs, "-o")
 	cmdArgs = append(cmdArgs, targetDirPath)
 
-	fmt.Println("mp4dash", cmdArgs)
-
 	cmd := exec.CommandContext(context.TODO(), "mp4dash", cmdArgs...)
 	out, err := cmd.Output()
 	if err != nil {
