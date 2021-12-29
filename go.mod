@@ -1,6 +1,6 @@
 module encoder
 
-go 1.14
+go 1.18
 
 require (
 	cloud.google.com/go v0.99.0 // indirect
